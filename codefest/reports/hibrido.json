@@ -1,0 +1,46 @@
+[
+ {
+  "sistema": "solo denso",
+  "known_item_recall@3": 0.905,
+  "known_item_mrr": 0.8458,
+  "known_item_ndcg@10": 0.8164,
+  "titulos_recall@3": 0.94,
+  "minigold_f1@3": 0.0917,
+  "minigold_ndcg@10": 0.9058,
+  "minigold_cobertura": 0.478,
+  "segundos": 39.2
+ },
+ {
+  "sistema": "híbrido w=0.5",
+  "known_item_recall@3": 0.915,
+  "known_item_mrr": 0.87,
+  "known_item_ndcg@10": 0.8414,
+  "titulos_recall@3": 0.855,
+  "minigold_f1@3": 0.2042,
+  "minigold_ndcg@10": 0.9604,
+  "minigold_cobertura": 0.4584,
+  "segundos": 31.3
+ },
+ {
+  "sistema": "híbrido w=1.0",
+  "known_item_recall@3": 0.93,
+  "known_item_mrr": 0.8825,
+  "known_item_ndcg@10": 0.8633,
+  "titulos_recall@3": 0.835,
+  "minigold_f1@3": 0.1625,
+  "minigold_ndcg@10": 0.9237,
+  "minigold_cobertura": 0.44,
+  "segundos": 32.0
+ },
+ {
+  "sistema": "híbrido w=1.5",
+  "known_item_recall@3": 0.93,
+  "known_item_mrr": 0.8808,
+  "known_item_ndcg@10": 0.8576,
+  "titulos_recall@3": 0.81,
+  "minigold_f1@3": 0.1625,
+  "minigold_ndcg@10": 0.9667,
+  "minigold_cobertura": 0.3178,
+  "segundos": 32.3
+ }
+]

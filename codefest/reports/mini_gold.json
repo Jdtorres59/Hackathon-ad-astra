@@ -1,0 +1,159 @@
+{
+ "n": 8,
+ "f1@3_medio": 0.09166666666666667,
+ "ndcg@10_vs_ideal": 0.9057983776968623,
+ "ndcg@10_orden": 0.801361921933771,
+ "cobertura_fragmento_media": 0.47802637085881533,
+ "cobertura_>0.5": 0.26666666666666666,
+ "filas": [
+  {
+   "pregunta": "¿Cómo están empleando los sistemas no tripulados potenciados por IA para aumentar la efectividad de las operaciones militares?",
+   "relevantes": [
+    "F1-DAIO-018",
+    "F1-DAIO-030",
+    "F3-SIPRI-016"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F1-CSET-125",
+    "F3-SIPRI-016",
+    "F1-DAIO-029"
+   ],
+   "f1@3": 0.3333333333333333,
+   "ndcg@10": 0.7155,
+   "cobertura_fragmentos": [
+    0.37,
+    0.382,
+    0.352
+   ]
+  },
+  {
+   "pregunta": "¿Qué lecciones dejan los conflictos recientes sobre el empleo de inteligencia artificial en operaciones militares?",
+   "relevantes": [
+    "F1-DAIO-023"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F3-CEEEP-004",
+    "F1-DAIO-001",
+    "F3-SIPRI-002"
+   ],
+   "f1@3": 0.0,
+   "ndcg@10": 0.9289,
+   "cobertura_fragmentos": [
+    0.426
+   ]
+  },
+  {
+   "pregunta": "¿Qué riesgos representa la escasez de talento especializado en inteligencia artificial para el desarrollo de capacidades de defensa?",
+   "relevantes": [
+    "F1-ILIA-006"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F1-DAIO-009",
+    "F3-CEEEP-010",
+    "F1-DAIO-033"
+   ],
+   "f1@3": 0.0,
+   "ndcg@10": 0.4264,
+   "cobertura_fragmentos": [
+    0.407
+   ]
+  },
+  {
+   "pregunta": "¿Cómo utilizan los grupos armados ilegales el control territorial para sustituir funciones del Estado y consolidar su influencia sobre las comunidades?",
+   "relevantes": [
+    "F3-MAPPOEA-018",
+    "F3-MAPPOEA-020"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F3-ALERTAS-419",
+    "F3-ALERTAS-413",
+    "F3-MAPPOEA-031"
+   ],
+   "f1@3": 0.0,
+   "ndcg@10": 1.2043,
+   "cobertura_fragmentos": [
+    0.438,
+    0.504
+   ]
+  },
+  {
+   "pregunta": "¿Qué corredores geográficos y territorios estratégicos son priorizados por los grupos armados para fortalecer su control operacional?",
+   "relevantes": [
+    "F3-MAPPOEA-014"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F3-MAPPOEA-035",
+    "F3-ALERTAS-397",
+    "F3-ALERTAS-413"
+   ],
+   "f1@3": 0.0,
+   "ndcg@10": 1.7861,
+   "cobertura_fragmentos": [
+    0.929
+   ]
+  },
+  {
+   "pregunta": "¿Cómo contribuyen las economías ilícitas al deterioro ambiental y al fortalecimiento de los grupos armados en América Latina?",
+   "relevantes": [
+    "F3-MAPPOEA-015"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F3-ALERTAS-417",
+    "F3-ALERTAS-421",
+    "F3-ALERTAS-413"
+   ],
+   "f1@3": 0.0,
+   "ndcg@10": 0.2662,
+   "cobertura_fragmentos": [
+    0.684
+   ]
+  },
+  {
+   "pregunta": "¿Qué actividades económicas ilegales convergen con la explotación de recursos naturales en zonas de conflicto?",
+   "relevantes": [
+    "F3-MAPPOEA-013",
+    "F3-MAPPOEA-015",
+    "F3-MAPPOEA-021"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F3-MAPPOEA-032",
+    "F3-ALERTAS-421",
+    "F3-ALERTAS-415"
+   ],
+   "f1@3": 0.0,
+   "ndcg@10": 0.8464,
+   "cobertura_fragmentos": [
+    0.429,
+    0.045,
+    0.396
+   ]
+  },
+  {
+   "pregunta": "¿Qué consecuencias sociales produce la escasez de agua en la región?",
+   "relevantes": [
+    "F3-MAPPOEA-013",
+    "F3-MAPPOEA-015"
+   ],
+   "no_resueltos": [],
+   "devueltos": [
+    "F3-MAPPOEA-013",
+    "F3-CEEEP-070",
+    "F3-ALERTAS-375"
+   ],
+   "f1@3": 0.4,
+   "ndcg@10": 1.0726,
+   "cobertura_fragmentos": [
+    1.0,
+    0.432,
+    0.377
+   ]
+  }
+ ]
+}

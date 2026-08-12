@@ -1,0 +1,35 @@
+[
+ {
+  "sistema": "denso+grafo",
+  "known_item_recall@3": 0.9,
+  "known_item_mrr": 0.8383,
+  "known_item_ndcg@10": 0.8085,
+  "titulos_recall@3": 0.92,
+  "minigold_f1@3": 0.0917,
+  "minigold_ndcg@10": 0.9058,
+  "minigold_cobertura": 0.478,
+  "segundos": 38.7
+ },
+ {
+  "sistema": "denso",
+  "known_item_recall@3": 0.9,
+  "known_item_mrr": 0.8467,
+  "known_item_ndcg@10": 0.8164,
+  "titulos_recall@3": 0.925,
+  "minigold_f1@3": 0.0917,
+  "minigold_ndcg@10": 0.9058,
+  "minigold_cobertura": 0.478,
+  "segundos": 27.7
+ },
+ {
+  "sistema": "BM25",
+  "known_item_recall@3": 0.97,
+  "known_item_mrr": 0.905,
+  "known_item_ndcg@10": 0.8813,
+  "titulos_recall@3": 0.725,
+  "minigold_f1@3": 0.1125,
+  "minigold_ndcg@10": 0.9295,
+  "minigold_cobertura": 0.3501,
+  "segundos": 1.8
+ }
+]

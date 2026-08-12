@@ -1,0 +1,13 @@
+# Dependencias de generador.py (CODEFEST AD ASTRA 2026, Etapa 1).
+# Probado con Python 3.12 en macOS arm64, con torch en CPU y en mps.
+#
+# generador.py no necesita spacy, pymupdf ni pysbd: esas solo hacen falta para
+# reconstruir la base vectorial desde el corpus, no para consultarla. El
+# reconocimiento de entidades del lado de la consulta usa el gazetteer
+# serializado que viaja en base_vectorial/grafo/gazetteer.json.
+faiss-cpu==1.15.0
+sentence-transformers==5.7.0
+torch==2.13.0
+transformers==5.14.1
+numpy==2.5.1
+networkx==3.6.1

@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.pyc
+codefest/.venv/
+codefest/data/
+codefest/reports/*.html
+CORPUS CODEFEST AD ASTRA 2026/
+codefest/entrega/modelos/
+codefest/entrega/base_vectorial/
+codefest/entrega/lib/

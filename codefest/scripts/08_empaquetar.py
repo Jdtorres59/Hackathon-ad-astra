@@ -43,6 +43,23 @@ README = """\
 
 Base de conocimiento vectorial y modulo de recuperacion.
 
+## Antes de ejecutar: rellenar base_vectorial/
+
+Los indices no caben en GitHub (siete archivos pasan de 100 MB). Estan
+publicados como Release en el mismo repositorio. Desde este directorio:
+
+```
+mkdir -p base_vectorial && cd base_vectorial
+BASE=https://github.com/Jdtorres59/Hackathon-ad-astra/releases/download/base-vectorial-v1
+for f in encoder_granite encoder_bge_m3 encoder_e5_large grafo; do
+  curl -L -o "$f.tar" "$BASE/$f.tar" && tar -xf "$f.tar" && rm "$f.tar"
+done
+cd ..
+```
+
+Son 1,6 GB. Si `base_vectorial/` ya trae los tres directorios `encoder_*` y
+`grafo/`, este paso sobra.
+
 ## Ejecucion
 
 ```
@@ -110,9 +127,11 @@ base_vectorial/
 
 ## Modelos
 
-Los pesos de los tres encoders vienen incluidos en `modelos/` y se cargan desde
-ahi, de modo que `generador.py` no necesita conexion a internet. Si ese
-directorio no estuviera presente, el script los descarga de HuggingFace.
+Si el directorio `modelos/` esta presente, los pesos se cargan desde ahi y
+`generador.py` no necesita conexion a internet. No viajan en el Release de
+GitHub porque cada `model.safetensors` supera el limite de 2 GB por asset, asi
+que en una copia clonada del repositorio el script los descarga de HuggingFace
+la primera vez. Son publicos y de licencia permisiva.
 
 Encoders utilizados (todos arquitectura encoder, licencia permisiva):
 

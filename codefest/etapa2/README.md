@@ -12,6 +12,8 @@ Todo lo que el equipo necesita para las 24 horas del 18 y 19 de septiembre de 20
 | **Juanda** | Frontend y diseño | [`roles/ROL_D_JUANDA.md`](roles/ROL_D_JUANDA.md) |
 | **Cadete Ortiz** | Dominio, validación y pitch | [`roles/ROL_CADETE_ORTIZ.md`](roles/ROL_CADETE_ORTIZ.md) |
 
+Cada uno tiene además un prompt de arranque listo para pegarle a su Claude en [`roles/PROMPTS_INICIALES.md`](roles/PROMPTS_INICIALES.md).
+
 Antes que nada, lee [`../../AGENTS.md`](../../AGENTS.md) en la raíz del repo. Está escrito para que tu Claude lo lea y arranque con contexto.
 
 ## Referencia compartida

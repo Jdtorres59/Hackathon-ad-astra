@@ -14,7 +14,7 @@ Están escritos para una sesión fría: traen las restricciones que hacen falta 
 Estoy en un hackathon de 24 horas de la Fuerza Aérea Colombiana con Uniandes que
 empieza a las 20:00 de hoy. Soy responsable del frente de plataforma y despliegue.
 
-Antes de proponer nada, lee estos dos archivos completos:
+Antes de proponer nada, lee estos archivos completos:
 - AGENTS.md (raíz del repo)
 - codefest/etapa2/CAMBIOS_TRAS_ESPECIFICACION.md
 - codefest/etapa2/CONTRATO_JURADO.md
@@ -104,19 +104,19 @@ Restricciones que no se negocian:
   idioma y texto. Nada de _row ni _score: son cientos de tokens de ruido por turno.
 - Trabajo en la rama feat/herramientas.
 
-Mi primera tarea es bajar la base de datos SQL que ADL dispuso en
-https://shorturl.at/YPQg0 y reportarle al equipo qué trae: tablas, columnas, filas, y
-si tiene fechas y ubicaciones normalizadas. Puede ahorrarnos horas de ETL.
+Mis tareas, en este orden:
+1. Bajar la base de datos SQL que ADL dispuso en https://shorturl.at/YPQg0 y reportarle
+   al equipo qué trae: tablas, columnas, filas, y si tiene fechas y ubicaciones
+   normalizadas. Puede ahorrarnos horas de ETL.
+2. Verificar que el motor de recuperación arranca de verdad en mi máquina. El patrón
+   exacto está en AGENTS.md y tiene tres trampas que cuestan horas si se ignoran.
+   Reportar cuánto tarda en cargar y cuánta RAM consume, porque eso determina
+   decisiones del resto del equipo.
+3. Antes de las 22:30, tener las firmas DEFINITIVAS de las tools mergeadas aunque
+   devuelvan datos falsos, porque Jair está bloqueado hasta entonces.
 
-Después, antes de las 22:30, tener las firmas DEFINITIVAS de las tools mergeadas aunque
-devuelvan datos falsos, porque Jair está bloqueado hasta entonces.
-
-Empieza por verificar que el motor de recuperación arranca de verdad en mi máquina.
-El patrón exacto está en AGENTS.md y tiene tres trampas que cuestan horas si se
-ignoran. Haz esa prueba primero y dime cuánto tarda en cargar y cuánta RAM consume,
-porque eso determina decisiones del resto del equipo.
-
-Después, dime cómo vas a estructurar las tools. No escribas la implementación todavía.
+Empieza por los dos primeros puntos y después dime cómo vas a estructurar las tools.
+No escribas la implementación todavía.
 ```
 
 ---
@@ -157,7 +157,7 @@ Mi primera tarea, antes de las 22:30:
 3. La pantalla de chat completa contra ese mock: burbujas, stream de tokens, panel de
    evidencia con citas, y la escalera de traza de agentes.
 
-Empieza leyendo los cuatro archivos y propón la estructura de componentes. Quiero que
+Empieza leyendo los archivos y propón la estructura de componentes. Quiero que
 la traza de agentes se vea bien desde el principio, porque es lo que le demuestra al
 jurado que hay una arquitectura multiagente de verdad y no un solo modelo.
 ```

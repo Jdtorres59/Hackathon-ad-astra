@@ -16,11 +16,17 @@ Cada uno tiene además un prompt de arranque listo para pegarle a su Claude en [
 
 Antes que nada, lee [`../../AGENTS.md`](../../AGENTS.md) en la raíz del repo. Está escrito para que tu Claude lo lea y arranque con contexto.
 
+## Leer primero, en este orden
+
+1. [`CAMBIOS_TRAS_ESPECIFICACION.md`](CAMBIOS_TRAS_ESPECIFICACION.md) — **qué cambió cuando llegó la especificación técnica**. Léelo aunque ya hayas leído tu rol.
+2. [`CONTRATO_JURADO.md`](CONTRATO_JURADO.md) — **lo vinculante**: formato de respuesta, ficha del agente, subdominios, modelos, presupuesto y cómo nos califican. Si el código contradice este archivo, gana este archivo.
+3. [`especificacion/ESPECIFICACION_TECNICA.md`](especificacion/ESPECIFICACION_TECNICA.md) — la fuente original, con los dos anexos.
+
 ## Referencia compartida
 
 | Documento | Para qué |
 |---|---|
-| [`RETO.md`](RETO.md) | Qué hay que entregar, a qué hora, con qué reglas y qué premios |
+| [`RETO.md`](RETO.md) | Lo que se dijo en la apertura: horas, premios, código de honor |
 | [`ARQUITECTURA.md`](ARQUITECTURA.md) | Agentes, flujo, contrato de API, eventos SSE. **El contrato entre los cuatro frentes** |
 | [`CRONOGRAMA.md`](CRONOGRAMA.md) | Horas, puntos de control y orden de sacrificio |
 | [`GIT.md`](GIT.md) | Ramas, orden de merge y qué hacer si algo se rompe |
@@ -32,12 +38,16 @@ Antes que nada, lee [`../../AGENTS.md`](../../AGENTS.md) en la raíz del repo. E
 ## Lo que hay que recordar aunque no leas nada más
 
 1. **08:00 y 12:30 son absolutas.** Un milisegundo tarde es cero.
-2. **Solo modelos open source** vía LiteLLM, con presupuesto en dinero y penalidad por excederlo.
+2. **Ocho modelos open source** vía Amazon Bedrock, con **100 USD** de presupuesto. Al superarlo, la API Key deja de funcionar.
 3. **Se evalúa lo desplegado en Coolify**, no lo que corre en tu portátil.
-4. **Evalúan la traza del agente por spans**, no solo la respuesta. Menos iteraciones puntúa mejor.
-5. **Nunca credenciales en el código.** Es criterio calificable.
-6. **`codefest/` no se toca.** Es el entregable de la Etapa 1 y se consume como librería.
+4. **El Reto 2 no es un dashboard con filtros**: un agente decide qué componentes activar. Eso vale el 55%.
+5. **Seguridad vale 20%** y ADL lanza ataques de prompt injection contra nuestro endpoint.
+6. **El repositorio del código es PRIVADO**, y el endpoint sigue evaluándose hasta las 12:30.
+7. **Nunca credenciales en el código.** Es criterio calificable.
+8. **`codefest/` no se toca.** Es el entregable de la Etapa 1 y se consume como librería.
 
 ## Pendiente
 
-El **handbook técnico** con especificaciones, rúbrica y proceso de entrega. Cuando llegue, lo vinculante se transcribe a `docs/CONTRATO_JURADO.md` antes de escribir código que dependa de ello.
+- **Confirmar con un mentor de ADL** por qué la especificación exige repositorio privado y la apertura dijo público con licencia permisiva.
+- **Los subdominios y la API Key**, que ADL entrega el día del reto.
+- **Bajar la base SQL** del Drive de ADL: `https://shorturl.at/YPQg0`

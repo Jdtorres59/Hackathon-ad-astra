@@ -75,6 +75,14 @@ Arreglar el derrame de tokens del planner en el chat
 
 ---
 
-## Al final
+## Dónde vive el código de la Etapa 2
 
-Lo que trabajemos nuevo (`backend/`, `frontend/`, `codefest/etapa2/`, `LICENSE`, `AGENTS.md`) se exporta al repositorio público que se entrega. **Con licencia permisiva**, que es criterio de descalificación si falta.
+**En un repositorio nuevo y PRIVADO**, no en este.
+
+La especificación técnica lo dice dos veces: *"repositorio privado en GitHub (no público)"* y *"debe permanecer privado en todo momento —nunca público—"*. El acceso a ADL y a los evaluadores se da invitándolos como colaboradores.
+
+Este repositorio, `Hackathon-ad-astra`, es público y es el entregable de la Etapa 1, que sigue pendiente de retroalimentación. **No se vuelve privado**: rompería esa entrega. Se queda como está, con la documentación del equipo.
+
+El repo privado es el que Coolify clona con la deploy key, y el que contiene `backend/`, `frontend/`, `agent_card.json`, el README con instrucciones de despliegue y el documento de arquitectura.
+
+Esto contradice lo que se dijo en la apertura, que fue repositorio público con licencia permisiva. **Confirmar con un mentor de ADL en la primera ronda.**

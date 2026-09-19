@@ -1,81 +1,127 @@
 # Frente D — Frontend y diseño · Juanda
 
-> Lee `AGENTS.md` en la raíz y `codefest/etapa2/DISENO.md` antes de escribir componentes.
+> Actualizado tras la especificación técnica. Lee `AGENTS.md`, `CAMBIOS_TRAS_ESPECIFICACION.md`, `CONTRATO_JURADO.md`, `ARQUITECTURA.md` y `DISENO.md`.
 
-## Por qué este frente
+## Lo que cambió, y es lo más grande del plan
 
-Es donde está el diferenciador del pitch, y es el único frente que puede avanzar sin depender de que el backend esté vivo. Esa segunda parte importa más de lo que parece: durante las primeras cuatro horas el backend va a estar roto la mitad del tiempo.
+**El Reto 2 no es un dashboard con filtros.** Es un tablero donde **un agente decide qué componentes mostrar** según lo que el usuario escribe en lenguaje natural.
 
-## Tu regla de oro
+> *"el sistema no debe limitarse a mostrar todos los componentes a la vez en un dashboard estático. El agente generador de visualizaciones debe decidir, a partir de la instrucción en lenguaje natural del usuario, cuál o cuáles componentes activar y con qué datos o filtros poblarlos."*
 
-**Trabaja contra mocks hasta las 00:00.** Un servidor SSE falso de sesenta líneas que reproduce un stream grabado. El frontend no puede quedar bloqueado nunca porque alguien rompió el backend.
+Y el peso lo confirma: **ejecución dinámica 55%**, propuesta de diseño 40%, código 5%.
+
+El maestro-detalle con filtros globales y brushing-and-linking sigue siendo bueno, pero **deja de ser el eje**. El eje es que el usuario escriba *"cómo evolucionaron las alertas en Nariño"* y aparezca una línea de tiempo con un mapa, poblados, sin que nadie toque un selector.
+
+**Además**: hay dos despliegues separados, `frontagent.` para el chat del Reto 1 y `dashboard.` para el Reto 2.
+
+---
+
+## El contrato que te define el trabajo
+
+`agente_visualizacion` no dibuja. Devuelve una especificación y **tú la renderizas**:
+
+```json
+{
+  "componentes": [
+    {
+      "tipo": "linea_tiempo",
+      "titulo": "Alertas tempranas en Nariño, 2017-2026",
+      "datos": {"endpoint": "/v1/analytics/alertas", "filtros": {"departamento": "Nariño"}},
+      "trazabilidad": [{"doc_id": "F3-ALERTAS-032", "chunk_id": "..."}]
+    }
+  ],
+  "justificacion": "..."
+}
+```
+
+Tu trabajo es un **registro de componentes**: un mapa de `tipo` a componente de React. El agente elige la clave, tú garantizas que cada clave renderiza bien con cualquier dato válido.
+
+**El catálogo se congela a las 21:00** con Jair y Joseph, porque es simultáneamente lo que el agente puede elegir, lo que tú sabes renderizar, y lo que hay que justificar por fenómeno en el documento de arquitectura que vale el 40%.
+
+### Catálogo propuesto
+
+| `tipo` | Qué es | Librería |
+|---|---|---|
+| `linea_tiempo` | Evolución temporal | Recharts |
+| `mapa_coropletico` | Intensidad por territorio, con PCODEs | Leaflet o react-simple-maps |
+| `mapa_puntos` | Ubicaciones concretas | Leaflet |
+| `red_entidades` | Relaciones del grafo con evidencia | react-force-graph |
+| `matriz_calor` | Cruce de dos categóricas | Recharts o SVG propio |
+| `barras_comparacion` | Comparar pocas categorías | Recharts |
+| `cuadrante` | Priorización por dos criterios | Recharts scatter |
+| `panel_evidencia` | Fragmentos citados con doc_id | Propio |
+
+El Anexo B advierte que **no hay que forzar un grafo o un mapa cuando la tarea es una comparación simple**. Por eso `barras_comparacion` tiene que verse tan bien como el mapa: si el agente elige barras y se ven pobres, parece que se equivocó.
 
 ---
 
 ## Tus archivos
 
 ```
-frontend/app/(chat)/page.tsx
-frontend/app/(tablero)/tablero/page.tsx
-frontend/app/api/chat/route.ts            ← proxy del stream, deja BACKEND_URL server-only
-frontend/components/chat/Conversacion.tsx
-frontend/components/chat/Mensaje.tsx
-frontend/components/chat/TrazaAgentes.tsx
-frontend/components/chat/Citas.tsx
-frontend/components/tablero/MapaCoropletico.tsx
-frontend/components/tablero/GloboTresD.tsx
-frontend/components/tablero/SerieTemporal.tsx
-frontend/components/tablero/FiltrosGlobales.tsx
-frontend/components/tablero/PanelDetalle.tsx
-frontend/lib/sse.ts
-frontend/lib/contratos.ts                 ← espejo de backend/app/contratos.py
-frontend/lib/api.ts
+frontend/app/(chat)/page.tsx                    ← frontagent.
+frontend/app/(tablero)/page.tsx                 ← dashboard.
+frontend/app/api/chat/route.ts                  ← proxy, deja BACKEND_URL server-only
+frontend/components/chat/{Conversacion,Mensaje,Citas,TrazaAgentes}.tsx
+frontend/components/viz/registro.ts             ← el mapa tipo → componente
+frontend/components/viz/{LineaTiempo,MapaCoropletico,MapaPuntos,RedEntidades,
+                          MatrizCalor,BarrasComparacion,Cuadrante,PanelEvidencia}.tsx
+frontend/lib/{sse.ts,contratos.ts,api.ts}
 frontend/mocks/servidor.ts
+Dockerfile.frontend
 ```
+
+Cada componente de `viz/` recibe la misma forma: `{titulo, datos, trazabilidad}`. Si todos cumplen esa interfaz, añadir un tipo nuevo es una línea en el registro.
 
 ---
 
-## El detalle que es criterio calificable
+## Trazabilidad: requisito, no adorno
 
-`frontend/app/api/chat/route.ts` hace de proxy del stream del backend. Eso deja `BACKEND_URL` como variable **server-only** y nunca como `NEXT_PUBLIC_`.
+> *"cualquier dato mostrado en un componente debe poder rastrearse hasta su `doc_id` y `chunk_id` de origen"*
 
-Las variables de entorno son criterio explícito de la rúbrica. Que una URL interna aparezca en el bundle del navegador es exactamente lo que van a mirar.
+Cada componente lleva un affordance para ver de dónde salieron sus datos. Lo más simple que funciona: un botón de "fuentes" que abre el `panel_evidencia` con los fragmentos.
+
+Los expertos van a tirar de ese hilo. Es de las cosas que distinguen un tablero serio de una demo.
+
+Y está **prohibido mostrar scores inventados**, tipo "índice de amenaza". Conteos y frecuencias sí.
 
 ---
 
 ## Orden de trabajo
 
-### 20:00-21:00 · Handbook
+### 21:00-22:30 · Esqueleto, mocks y chat
 
-Lee el handbook con el resto del equipo. Lo que te toca extraer: si especifican algo de la interfaz, del tono de las respuestas, o del formato de entrega de capturas o video.
+1. `create-next-app` con TypeScript y Tailwind, shadcn init, tokens de `DISENO.md`
+2. `frontend/mocks/servidor.ts` con los eventos SSE **y** un spec de componentes de ejemplo
+3. Pantalla de chat completa contra el mock
 
-### 21:00-22:30 · Esqueleto y mocks
-
-1. `create-next-app` con Tailwind y TypeScript, shadcn init, tokens de `DISENO.md` en `globals.css`
-2. `frontend/mocks/servidor.ts`: un endpoint que emite los eventos SSE del contrato con retardos realistas
-3. La pantalla de chat completa contra el mock: burbujas, stream de tokens, panel de evidencia, escalera de traza
-
-A las 22:30 debería verse una conversación creíble aunque no exista un solo agente real. Eso es lo que le permite a Jair depurar el SSE contra algo que ya funciona.
+A las 22:30 debe verse una conversación creíble sin que exista un agente real.
 
 ### 22:30-00:30 · Conectar
 
-Cuando Jair tenga el stream real, cambia la URL del mock por la del proxy. Si el contrato se respetó, no debería cambiar nada más.
+Cambia la URL del mock por el proxy. Si el contrato se respetó, no cambia nada más.
 
-Aquí aparece el bug clásico: si ves JSON del `planner` derramándose en la burbuja del chat, es que falta filtrar los tokens por nodo. Avísale a Jair, está documentado en su rol.
+Si ves JSON del orquestador derramándose en la burbuja, falta filtrar tokens por nodo. Avísale a Jair.
 
 ### 00:30-03:00 · Pulir el Reto 1
 
-Estados vacíos, de carga y de error. Progreso de arranque real leyendo `/health`. Costo por turno al pie de cada respuesta. Responsive a 390 px. Citas que abren el panel de evidencia.
+Estados vacíos, de carga y de error. Costo por turno al pie. Responsive a 390 px. Citas que abren el panel de evidencia. Progreso de arranque leyendo `/health`.
 
 ### 03:00-05:00 · Dormir
 
-Turnos de dos personas. No negociable: el pitch es a las 14:00 y lo das tú.
+Turnos de dos. El pitch es a las 14:00 y lo das tú.
 
-### 08:30-11:00 · Tablero
+### 08:30-11:00 · El tablero
 
-Filtros globales primero, luego KPIs, luego la visualización principal, y al final el globo. **Ese orden importa**: si a las 10:00 el globo no está, entregas 2D y no pasa nada. Si a las 10:00 no están los filtros, no hay tablero.
+**Este es el orden, y no lo cambies:**
 
-El enlace bidireccional con el chat es requisito, no adorno: la caja de pregunta hereda los filtros activos y los manda en `filtros_tablero`.
+1. El **registro de componentes** y dos tipos funcionando de punta a punta con spec real del agente
+2. `barras_comparacion` y `linea_tiempo`, que son los más probables y los más rápidos
+3. `mapa_coropletico` con los PCODEs
+4. `panel_evidencia`, que cierra la trazabilidad
+5. `red_entidades` y `matriz_calor`
+6. `cuadrante` y `mapa_puntos` si sobra
+
+**Dos componentes que el agente activa bien valen más que ocho que no sabe cuándo usar.** El 55% es la ejecución dinámica, no la cantidad.
 
 ---
 
@@ -83,23 +129,23 @@ El enlace bidireccional con el chat es requisito, no adorno: la caja de pregunta
 
 | Hora | Qué |
 |---|---|
-| **22:30 CP1** | Un stream SSE llega al navegador y se ve una conversación |
-| **00:30 CP2** | Conectado al backend real, con citas y traza reales |
-| 07:00 | Freeze Reto 1: capturas para la documentación |
-| **10:00 CP4** | El tablero pinta con datos reales y el chat lee los filtros |
+| 21:00 | Catálogo de componentes congelado con Jair y Joseph |
+| **22:30** | Un stream SSE llega al navegador y se ve una conversación |
+| **00:30** | Conectado al backend real, con citas y traza |
+| 07:00 | Freeze Reto 1. Capturas para la documentación |
+| **10:00** | El agente activa componentes reales con datos reales |
 | 11:30 | Freeze Reto 2 |
+
+Si a las 10:00 no hay ejecución dinámica funcionando, **corta tipos de componente, no el mecanismo**. Un tablero con tres componentes que el agente activa bien puntúa mucho más que ocho estáticos.
 
 ---
 
-## Lo que también te toca, y no es código
+## Lo que también te toca
 
 **El pitch lo das tú con el cadete Ortiz.** Cinco minutos más tres de preguntas, llamado aleatorio desde las 14:00.
 
-A las 12:30, cuando cierre el Reto 2:
+La rúbrica del pitch tiene ocho aspectos: presentación del problema, arquitectura y metodología, resultados clave, demostración, reflexión sobre desafíos, aplicabilidad a cada fenómeno, identificación de patrones y hallazgos, y **verificación de fuentes**.
 
-1. Deck de **siete láminas máximo**
-2. **Dos ensayos con cronómetro.** Cinco minutos se pasan volando y cortar a mitad de frase se ve mal
-3. **Grabar un video de la demo funcionando**, como plan B si se cae la red. Fue recomendación explícita de la charla de Bantor
-4. Preparar las tres preguntas predecibles: costo por consulta, por qué estos agentes, qué harían con otra semana
+Ese último punto conecta directo con la trazabilidad: **enseña en vivo cómo un dato del tablero se rastrea hasta su fragmento**. Es el momento del pitch con mejor relación entre esfuerzo e impacto.
 
-Ortiz explica por qué el problema importa. Tú muestras el producto.
+A las 12:30: deck de siete láminas, dos ensayos con cronómetro, y **grabar un video de la demo funcionando** como plan B si se cae la red.

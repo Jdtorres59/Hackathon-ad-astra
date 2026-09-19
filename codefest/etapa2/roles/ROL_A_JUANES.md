@@ -1,210 +1,197 @@
 # Frente A — Plataforma y despliegue · Juanes
 
-> Lee primero `AGENTS.md` en la raíz del repo. Este documento asume que ya lo leíste.
+> Actualizado tras la especificación técnica. Lee `AGENTS.md`, `CAMBIOS_TRAS_ESPECIFICACION.md` y `CONTRATO_JURADO.md`.
 
 ## Por qué te tocó este frente
 
-Es el único que puede matar la entrega por sí solo. Si el asistente es brillante pero no está desplegado en Coolify a las 08:00, la nota es cero. Además, durante las primeras tres horas los otros tres frentes dependen de que tu esqueleto exista, así que necesitas desbloquear sin esperar a nadie.
+Es el único que puede matar la entrega por sí solo. Y ahora además tienes dos requisitos que nadie más puede cubrir: el repositorio privado y los tres subdominios en el Coolify de ADL.
 
-## Tu regla de oro
+---
 
-**Despliega un hello-world por el pipeline completo antes de que exista un solo agente.** Coolify, Dockerfile, volumen montado, URL pública que responde. Si eso no está verde a las 23:00, el equipo entero cambia de plan y tú lo anuncias.
+## Lo que cambió respecto de lo que leíste antes
+
+1. **Coolify lo provee ADL**, no lo instalas tú. Hay un espacio de trabajo por equipo con panel en `coolify.<equipo>.codefest2026.augusta.avaldigitallabs.com`. El correo previo sobre instalación local era práctica. **Esto te quita de encima el mayor riesgo del plan anterior.**
+2. **El repositorio debe ser PRIVADO.** No público. Es lo contrario de lo que dijeron en la apertura.
+3. **Presupuesto: 100 USD.** Ya no es un placeholder.
+4. **Ocho modelos concretos** vía Amazon Bedrock con una API Key.
+5. **Tres subdominios** que configuras tú.
+
+---
+
+## Tu primera hora, en este orden
+
+### 1. Crear el repositorio privado
+
+El repo actual `Hackathon-ad-astra` es público y es el entregable de la Etapa 1, que sigue pendiente de retroalimentación. **No lo vuelvas privado**: rompería esa entrega.
+
+Crea uno nuevo, privado, para la Etapa 2. Invita como colaboradores al usuario o correo de GitHub de ADL y de los evaluadores en cuanto te den los datos.
+
+**Pregúntale a un mentor de ADL en la primera ronda** por qué la especificación dice privado y la apertura dijo público con licencia permisiva. Es una contradicción real y más vale resolverla temprano.
+
+### 2. Los subdominios
+
+| Servicio | Subdominio | Quién |
+|---|---|---|
+| Panel de Coolify | `coolify.<equipo>...` | **ADL. No tocar.** |
+| Endpoint del agente | `agent.<equipo>...` | Tú |
+| Frontend de chat | `frontagent.<equipo>...` | Tú |
+| Dashboard | `dashboard.<equipo>...` | Tú |
+
+En cada uno: **Port** igual al puerto interno del contenedor, y **www redirect** en **No redirect**.
+
+### 3. El despliegue
+
+1. Llave SSH **desde el panel de Coolify**: Root Team → Keys & Tokens → Private Keys → New Private Key → Generate ED25519
+2. La pública se registra en GitHub: Settings → SSH and GPG keys → New SSH key
+3. Recurso tipo **Applications → Private Git Repository (with Deploy Key)**
+4. Repository configuration: URL del repo privado, Branch `main`, **Build pack = Dockerfile**
+5. Variables de entorno en **Environment Variables**, marcables Buildtime, Runtime o ambos
+
+`Dockerfile` autosuficiente, **healthcheck** recomendado, **un único puerto HTTP** por contenedor.
+
+**Despliega un hello-world por el pipeline completo antes de que exista un solo agente.** Si no está verde a las 23:00, avisa y el equipo cambia de plan.
 
 ---
 
 ## Tus archivos
 
-Nadie más los toca.
-
 ```
-LICENSE                                  ← ya está creado
-docker-compose.yml
-Dockerfile.backend
+Dockerfile.agent
 Dockerfile.frontend
+docker-compose.yml                       ← solo para desarrollo local
 .env.example
-backend/app/main.py                      ← lifespan, CORS, /health, /ready
+backend/app/main.py                      ← lifespan, /health, CORS
 backend/app/deps.py                      ← singleton del Retriever
-backend/app/contratos.py                 ← los modelos Pydantic compartidos
-backend/app/llm/cliente.py               ← el ÚNICO lugar donde se instancia un LLM
+backend/app/contratos.py                 ← modelos Pydantic compartidos
+backend/app/llm/cliente.py               ← el ÚNICO lugar donde se instancia un modelo
 backend/app/observabilidad/contador.py
 backend/app/observabilidad/presupuesto.py
 backend/app/cache.py
-backend/app/routers/jurado.py            ← cuando llegue el handbook
-docs/CONTRATO_JURADO.md
+backend/app/routers/jurado.py            ← POST /chat, el contrato con ADL
+agent_card.json                          ← la ficha, en la raíz del repo
+README.md                                ← instrucciones de despliegue
+docs/ARQUITECTURA.md                     ← diseño y rationale, vale 20% del Reto 1
 ```
 
 ---
 
-## Orden de trabajo
+## Los contratos, a las 21:00
 
-### 20:00-21:00 · La hora del handbook
+Todos los demás frentes están bloqueados hasta que exista `backend/app/contratos.py`. Es tu entregable más urgente después de Coolify.
 
-**No escribas código de agentes.** Lee el handbook completo y transcribe a `docs/CONTRATO_JURADO.md` exactamente esto:
-
-- Ruta y método del endpoint que consume el jurado
-- Esquema literal de request y de response
-- IDs de los modelos disponibles en LiteLLM
-- Precio por millón de tokens de entrada y de salida de cada uno
-- Cifra del presupuesto asignado
-- Definición del tono que evalúan
-- Formato y canal de entrega
-
-Aval Digital Labs lo advirtió textualmente: si el endpoint no cumple la guía al pie de la letra, no pueden evaluar la solución. Esta hora es la de mayor apalancamiento de las 24.
-
-En paralelo, instala Coolify. Es lo único que sí puedes adelantar durante esta hora.
-
-### 21:00 · Congela los contratos
-
-`backend/app/contratos.py` es tu entregable más urgente. Todos los demás frentes se bloquean hasta que exista. Mínimo:
+Lo crítico son los modelos que producen el JSON de la Sección 2.4, porque ese es el contrato con el evaluador:
 
 ```python
-class QueryPlan(BaseModel):
-    intencion: Literal["factual","comparativa","entidad","analitica","fuera_de_dominio"]
-    fenomenos: list[Literal[1,2,3]]
-    consulta_reescrita: str
-    entidades: list[str]
-    idioma_respuesta: Literal["es","en"]
-    necesita_grafo: bool
-    necesita_datos: bool
+class ToolCall(BaseModel):
+    name: str
+    input_parameters: dict
+    output: str
 
-class Cita(BaseModel):
-    doc_id: str
-    chunk_id: str
-    titulo: str
-    fenomeno: int
-    observatorio: str
-    texto: str
+class Evaluacion(BaseModel):
+    input: str
+    actual_output: str
+    retrieval_context: list[str] = []
+    tools_called: list[ToolCall] = []
 
-class Evidencia(BaseModel):
-    fragmentos: list[Cita]
-    documentos: list[str]
-    entidades: list[str]
-    notas: str = ""
-
-class Span(BaseModel):
-    span_id: str
-    padre: str | None
+class TokensAgente(BaseModel):
     agente: str
-    ms: int
-    tokens_in: int
-    tokens_out: int
-    costo_usd: float
+    modelo: str
+    input: int
+    output: int
+    total: int
 
-class RespuestaChat(BaseModel):
-    turno_id: str
+class Tokens(BaseModel):
+    input: int
+    output: int
+    total: int
+
+class MetadataRespuesta(BaseModel):
+    num_interacciones: int
+    agentes_invocados: list[str]
+    tokens: Tokens
+    tokens_por_agente: list[TokensAgente] = []
+    latencia_ms: int
+    estado: str = "ok"
+
+class RespuestaJurado(BaseModel):
     respuesta: str
-    citas: list[Cita]
-    graficos: list[dict] = []
-    traza: list[Span]
-    iteraciones: int
-    costo_usd: float
+    evaluacion: Evaluacion
+    metadata: MetadataRespuesta
 ```
 
-Avisa en voz alta cuando esté mergeado. Jair y Joseph rebasan inmediatamente.
-
-### 21:00-22:30 · Arranque del backend
-
-El orden dentro de `lifespan` importa:
-
-```python
-import codefest  # ESTA LÍNEA VA PRIMERA, antes que faiss y torch
-
-@asynccontextmanager
-async def lifespan(app):
-    app.state.listo = asyncio.Event()
-    app.state.progreso = "arrancando"
-    asyncio.create_task(asyncio.to_thread(_calentar, app))
-    yield
-```
-
-`_calentar`, en este orden exacto:
-
-1. `config.set_entrega_dir(os.environ["CODEFEST_ENTREGA_DIR"])` — obligatorio
-2. `Retriever(base_dir=..., slugs=["bge_m3"], use_graph=False, device="cpu")` — unos 40 s
-3. Un `search("prueba")` de calentamiento que fuerza los pesos — unos 15 s
-4. `app.state.listo.set()`
-
-`/ready` devuelve 503 hasta que `listo` esté puesto. `/health` expone `app.state.progreso` como texto legible, tipo `"cargando índice bge_m3 · 38 s"`, para que el frontend muestre algo real en vez de una pantalla congelada.
-
-### El volumen, no la imagen
-
-Los 6,4 GB de `codefest/entrega/` **no entran a la imagen ni a git**. Coolify monta el directorio del host:
-
-```yaml
-volumes:
-  - /Users/<host>/Hackathon ad astra/codefest/entrega:/data/entrega:ro
-environment:
-  CODEFEST_ENTREGA_DIR: /data/entrega
-```
-
-La imagen queda en ~1,5 GB. El backend instala la librería de la Etapa 1 sin duplicar código:
-`COPY codefest/src codefest/pyproject.toml` y luego `pip install -e /app/codefest`.
-
-Límites de memoria: 5 GB la API, 1,5 GB el contenedor de grafo si existe, 1 GB Next.js.
+`metadata.tokens.total` debe sumar **todos** los modelos, orquestador y sub-agentes. Está marcado como requisito obligatorio y es de las cosas que más fácil se implementan mal.
 
 ---
 
-## El cliente LLM: un solo punto de estrangulamiento
+## La ficha del agente
 
-`backend/app/llm/cliente.py::obtener_llm(rol: str)`. **Ningún otro archivo instancia un modelo.** LiteLLM es compatible con OpenAI, así que cambiar de modelo es cambiar un string.
+`agent_card.json` en la raíz. Formato propio de ADL, **no es el estándar A2A**. Está literal en `CONTRATO_JURADO.md` sección 5.
+
+Vale el 20% del Reto 1 junto con el documento de arquitectura. Dos cosas que se olvidan:
+
+- El `endpoint` debe ser exactamente el subdominio `agent.` configurado.
+- **Si Jair cambia un modelo a las 04:00, la ficha hay que actualizarla.** El modelo declarado es estructural y se usa para calcular nuestro costo por pregunta.
+
+---
+
+## El cliente LLM
+
+`backend/app/llm/cliente.py::obtener_llm(rol)`. Ningún otro archivo instancia un modelo.
 
 ```
-LITELLM_BASE_URL=
-LITELLM_API_KEY=
-MODELO_PLANNER=              # el más barato del catálogo
-MODELO_INVESTIGADOR=
-MODELO_REDACTOR=             # el mejor que aguante el presupuesto
-MODELO_ANALISTA=
-MODELO_NARRADOR=
-MODELO_VERIFICADOR=          # DISTINTO del redactor
-PRESUPUESTO_TOTAL_USD=
+BEDROCK_API_KEY=
+BEDROCK_BASE_URL=
+MODELO_ORQUESTADOR=gpt-oss-20b
+MODELO_CORPUS=gpt-oss-120b
+MODELO_VISUALIZACION=gpt-oss-120b
+MODELO_VERIFICADOR=llama-3.3-70b-instruct
+PRESUPUESTO_TOTAL_USD=100
 PRESUPUESTO_AHORRO_PCT=0.85
 PRESUPUESTO_CORTE_PCT=0.95
 MAX_USD_POR_TURNO=0.05
 MAX_ITERACIONES_POR_TURNO=6
-MAX_TOOL_CALLS_INVESTIGADOR=2
-MAX_TOOL_CALLS_ANALISTA=3
 ```
+
+Los ocho modelos disponibles están en `CONTRATO_JURADO.md` sección 2.
 
 ---
 
-## Presupuesto: frenos en escalera
+## Presupuesto: ahora hay una cifra
 
-`observabilidad/contador.py` es un `BaseCallbackHandler` que lee `response.usage` de cada llamada y escribe en SQLite: `(turno_id, span_id, agente, modelo, tokens_in, tokens_out, usd, ts)`.
+**100 USD.** Al superarlos, la API Key deja de estar disponible. No es una advertencia, es un corte.
+
+Además, la eficiencia se normaliza **contra los otros diecinueve equipos**, no contra un umbral. Ser eficiente no basta: hay que serlo más que ellos.
 
 | Umbral | Acción |
 |---|---|
-| Por turno | Al exceder `MAX_USD_POR_TURNO` **no lanza excepción**: corta al redactor con la evidencia que haya. Degradar le gana a reventar. |
-| 70% | Warning en logs, chip ámbar en la UI |
-| 85% | Modo ahorro: fuerza `modo=rapido`, apaga verificador y grafo, baja `n_fragments` de 10 a 5 |
-| 95% | Sirve solo desde caché; en miss, respuesta extractiva determinista sin LLM |
+| Por turno | Al exceder `MAX_USD_POR_TURNO` no lanza excepción: corta y responde con lo que haya |
+| 70% (70 USD) | Warning ruidoso, chip ámbar en la interfaz |
+| 85% | Modo ahorro: apaga verificador, baja `n_fragments`, modelo barato en todo |
+| 95% | Solo caché; en miss, respuesta extractiva sin LLM |
 
-El sistema nunca se apaga: **se vuelve extractivo**. Es un modo de fallo honesto y se dice en el pitch como demostración de costo-efectividad.
-
-**Reconcilia tu contador con el dashboard de LiteLLM a las 00:00 y a las 04:00.** Si divergen más del 15%, cree al dashboard y recalibra tus constantes.
+**La caché desde las 21:00.** Cuatro personas machacando las mismas treinta preguntas durante dieciséis horas es de donde sale el gasto real.
 
 ---
 
-## La caché es el ahorro de verdad
+## La ventana que es fácil olvidar
 
-`cache.db` en SQLite, clave `sha256(mensaje_normalizado + filtros + modo + version_prompt)`.
+**El Reto 1 se evalúa de 08:00 a 12:30 del sábado.** No es entregar y apagar: ADL consulta el endpoint y le lanza ataques de prompt injection durante esas cuatro horas y media.
 
-Durante 16 horas cuatro personas van a machacar las mismas treinta preguntas cientos de veces. **Enciéndela a las 21:00, no a las 05:00.** Es probablemente la decisión que más dinero salva de todo el plan.
+Eso significa que el trabajo del Reto 2 ocurre **mientras el Reto 1 está siendo evaluado en vivo**. Después de las 08:00:
 
-Aparte, `MODO_GRABACION=1` guarda cada par de request y stream completo en `grabaciones/`, y `MODO_REPRODUCCION=1` los reproduce. Sirve como ahorro mientras Juanda trabaja el frontend, y como **plan B de demo** si se cae la red durante el pitch.
+- No se rompe `main`
+- No se tumba el contenedor del agente
+- Si hay que desplegar el dashboard, se despliega como recurso **separado**
 
----
-
-## Tu checklist antes de cada deadline
-
-1. `docker compose build backend` en verde
-2. `curl /health` y `/ready` responden **desde el contenedor desplegado**, no en local
-3. La URL de Coolify abre **desde un teléfono con datos móviles**, no desde el wifi del campus
-4. Tag creado: `entrega-reto1` a las 07:40, `entrega-reto2` a las 12:10
-5. Rama `demo/respaldo` creada a las 07:30 y a las 12:00
+Es la restricción operativa más cara de las que se olvidan.
 
 ---
 
-## Si Coolify no levanta
+## Checklist antes de cada hito
 
-Tienes hasta las 23:00. Si a esa hora no hay un hello-world desplegado, **lo anuncias y el equipo cae a `docker compose` más un túnel**. Se documenta en el README y se dice en el pitch. Perder dos horas peleando con Coolify a las 02:00 es cómo se pierde este hackathon.
+1. `docker build` en verde
+2. `/health` responde **desde el subdominio público**, no en local
+3. `POST /chat` devuelve el JSON exacto de la Sección 2.4, validado contra el esquema
+4. `agent_card.json` actualizado con los modelos que de verdad se están usando
+5. La URL abre **desde un teléfono con datos móviles**
+6. README con instrucciones de despliegue y documento de arquitectura en el repo

@@ -62,7 +62,7 @@ Confirmado dos veces: los análisis y agentes adicionales tienen **bonificación
 
 > *"El diseño y uso de cada componente debe estar correctamente documentado, porque somos rigurosos en la calidad. De nada nos sirve un producto funcional si no lo documentamos bien, si no está bien diseñado."*
 
-El handbook detalla qué documentación exactamente. Se entrega junto con la solución.
+La especificación lo concreta: README con instrucciones de despliegue, documento de arquitectura con el rationale del diseño, e instrucciones de uso. Vale el 20% del Reto 1.
 
 ---
 
@@ -103,7 +103,7 @@ El orden aleatorio importa: **hay que estar listos a las 14:00**, no a las 16:00
 ## Recursos disponibles durante el reto
 
 **Mentores de empresas**, desde las 20:00, rondas formales a las 23:00:
-- **ADL** (Aval Digital Labs) — son los que montaron la infraestructura, LiteLLM y Coolify
+- **ADL** (Aval Digital Labs) — son los que montan la infraestructura: Coolify, la API Key de Bedrock y la evaluación
 - **Conecto** — agentic RAG, tools, MCP
 - **Blend 360** — arquitectura multiagente, observabilidad
 
@@ -161,8 +161,6 @@ Ediciones anteriores, útil para situar la ambición: 2022 Atenea AI (procesamie
 
 ---
 
-## Pendiente
+## La especificación técnica
 
-El **handbook técnico** con especificaciones, **rúbrica de evaluación** y proceso de entrega llega por los canales de comunicación del equipo. Contiene el contrato exacto del endpoint, los IDs de modelo, los precios por millón de tokens y la cifra de presupuesto.
-
-Cuando llegue: transcribir lo vinculante a `CONTRATO_JURADO.md` antes de escribir código que dependa de ello.
+**Ya llegó.** Está en `especificacion/ESPECIFICACION_TECNICA.md` y lo vinculante está transcrito en `CONTRATO_JURADO.md`. Lo que cambió respecto de lo que se planeó antes está en `CAMBIOS_TRAS_ESPECIFICACION.md`.
